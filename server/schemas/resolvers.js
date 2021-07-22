@@ -1,6 +1,6 @@
-const AuthError = require('apollo-server-express');
-const User = require('../models');
-const signToken = require('../utils/auth');
+const { AuthError } = require('apollo-server-express');
+const { User } = require('../models');
+const { sToken } = require('../utils/auth');
 
 const resolver = {
     Query: {
@@ -11,7 +11,31 @@ const resolver = {
           return userData;
         }
   
-        throw new AuthenticationError('Not logged in');
+        throw new AuthError('Not logged in');
       },
     },
-}
+    Mutation: {
+        addUser: async (parent, args) => {
+          const user = await User.create(args);
+          const token = sToken(user);
+    
+          return { token, user };
+        },
+        login: async (parent, { email, password }) => {
+          const user = await User.findOne({ email });
+    
+          if (!user) {
+            throw new AuthError('you got the wrong credentials :/');
+          }
+    
+          const correctPw = await user.isCorrectPassword(password);
+    
+          if (!correctPw) {
+            throw new AuthError('you got the wrong credentials :/');
+          }
+    
+          const token = sToken(user);
+          return { token, user };
+        },
+    }
+};
