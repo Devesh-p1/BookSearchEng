@@ -31,11 +31,24 @@ const resolver = {
           const correctPw = await user.isCorrectPassword(password);
     
           if (!correctPw) {
-            throw new AuthError('you got the wrong credentials :/');
+            throw new AuthError('you got the wrong credentials :/ smh');
           }
     
           const token = sToken(user);
           return { token, user };
         },
+        saveBook: async (parent, { bookData }, context) => {
+            if (context.user) {
+              const updatedUser = await User.findByIdAndUpdate(
+                { _id: context.user._id },
+                { $push: { savedBooks: bookData } },
+                { new: true }
+              );
+      
+              return updatedUser;
+            }
+      
+            throw new AuthError('Yo you gotta log in fam, what you doin?');
+          },
     }
 };
