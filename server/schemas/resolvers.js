@@ -2,7 +2,7 @@ const { AuthError } = require('apollo-server-express');
 const { User } = require('../models');
 const { sToken } = require('../utils/auth');
 
-const resolver = {
+const resolvers = {
     Query: {
       me: async (parent, args, context) => {
         if (context.user) {
@@ -64,4 +64,4 @@ const resolver = {
     },
 };
 
-module.exports = resolver;
+module.exports = resolvers;
